@@ -226,3 +226,17 @@ button:disabled {
         font-size: 24px;
     }
 }
+
+.hidden {
+    display: none;
+}
+
+.reset {
+    width: 100%;
+    background: #d97706;
+    color: white;
+}
+
+.reset:active {
+    transform: scale(0.97);
+}

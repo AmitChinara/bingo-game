@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
 
     <meta name="viewport"
-          content="width=device-width, initial-scale=1.0,
-                   maximum-scale=1.0, user-scalable=no">
+          content="width=device-width,
+                   initial-scale=1.0,
+                   maximum-scale=1.0,
+                   user-scalable=no">
 
     <title>Bingo</title>
 
@@ -22,23 +24,30 @@
         Tap any box to place 1
     </div>
 
-    <!-- 5 x 5 BOARD -->
     <div id="board" class="board"></div>
 
-    <!-- CURRENT NUMBER -->
     <div id="currentNumber" class="current-number">
         -
     </div>
 
-    <!-- SETUP BUTTONS -->
+    <!-- Setup Buttons -->
     <div id="setupButtons" class="buttons">
 
         <button id="undoButton">
             Undo
         </button>
 
-        <button id="startButton">
+        <button id="startButton" disabled>
             Start
+        </button>
+
+    </div>
+
+    <!-- Game Button -->
+    <div id="gameButtons" class="buttons hidden">
+
+        <button id="resetLogicButton" class="reset">
+            Reset Logic
         </button>
 
     </div>

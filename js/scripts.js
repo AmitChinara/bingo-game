@@ -6,16 +6,23 @@ const message = document.getElementById("message");
 const undoButton = document.getElementById("undoButton");
 const startButton = document.getElementById("startButton");
 
+const setupButtons = document.getElementById("setupButtons");
+const gameButtons = document.getElementById("gameButtons");
+const resetLogicButton = document.getElementById("resetLogicButton");
+
+
+// ====================================
+// GAME VARIABLES
+// ====================================
+
 let boardNumbers = Array(25).fill(null);
 let placedBoxes = [];
 
 let nextNumber = 1;
 let gameStarted = false;
 
-// Bingo letters
 const bingoLetters = ["B", "I", "N", "G", "O"];
 
-// Keep track of lines that have already been counted
 let completedLines = new Set();
 
 
@@ -46,30 +53,23 @@ for (let i = 0; i < 25; i++) {
 function handleBoxClick(index) {
 
     if (!gameStarted) {
-
-        // Setup mode
         placeNumber(index);
-
     } else {
-
-        // Game mode
         crossNumber(index);
     }
 }
 
 
 // ====================================
-// PLACE NUMBER 1 → 25
+// PLACE NUMBER
 // ====================================
 
 function placeNumber(index) {
 
-    // Don't overwrite an existing number
     if (boardNumbers[index] !== null) {
         return;
     }
 
-    // Don't go beyond 25
     if (nextNumber > 25) {
         return;
     }
@@ -82,7 +82,8 @@ function placeNumber(index) {
 
     nextNumber++;
 
-    undoButton.disabled = placedBoxes.length === 0;
+    undoButton.disabled =
+        placedBoxes.length === 0;
 
 
     if (nextNumber > 25) {
@@ -101,7 +102,7 @@ function placeNumber(index) {
 
 
 // ====================================
-// UNDO
+// UNDO LAST NUMBER
 // ====================================
 
 undoButton.addEventListener("click", () => {
@@ -114,20 +115,18 @@ undoButton.addEventListener("click", () => {
         return;
     }
 
-    // Last placed box
     const index = placedBoxes.pop();
 
-    // Remove number
     boardNumbers[index] = null;
 
     board.children[index].textContent = "";
 
-    // Reuse that number
     nextNumber--;
 
     startButton.disabled = true;
 
-    undoButton.disabled = placedBoxes.length === 0;
+    undoButton.disabled =
+        placedBoxes.length === 0;
 
     status.textContent =
         `Tap a box to place ${nextNumber}`;
@@ -149,6 +148,10 @@ startButton.addEventListener("click", () => {
     undoButton.disabled = true;
     startButton.disabled = true;
 
+    setupButtons.classList.add("hidden");
+
+    gameButtons.classList.remove("hidden");
+
     status.textContent =
         "Tap any number to cross it";
 
@@ -161,7 +164,7 @@ startButton.addEventListener("click", () => {
 
 
 // ====================================
-// CROSS ONLY THE CLICKED BOX
+// CROSS CLICKED BOX
 // ====================================
 
 function crossNumber(index) {
@@ -170,32 +173,29 @@ function crossNumber(index) {
 
     const number = boardNumbers[index];
 
-    // Invalid box
     if (number === null) {
         return;
     }
 
-    // Already crossed
+    // Don't cross an already crossed box
     if (box.classList.contains("crossed")) {
         return;
     }
 
-    // Cross ONLY this box
+    // Cross only the clicked box
     box.classList.add("crossed");
 
-    // Show number
     currentNumber.textContent = number;
 
     status.textContent =
         `Number ${number} crossed`;
 
-    // Check for newly completed lines
     checkLines();
 }
 
 
 // ====================================
-// CHECK ALL STRAIGHT LINES
+// CHECK BINGO LINES
 // ====================================
 
 function checkLines() {
@@ -204,7 +204,7 @@ function checkLines() {
 
 
     // --------------------------------
-    // HORIZONTAL LINES
+    // HORIZONTAL
     // --------------------------------
 
     for (let row = 0; row < 5; row++) {
@@ -212,7 +212,6 @@ function checkLines() {
         const line = [];
 
         for (let column = 0; column < 5; column++) {
-
             line.push(row * 5 + column);
         }
 
@@ -225,7 +224,7 @@ function checkLines() {
 
 
     // --------------------------------
-    // VERTICAL LINES
+    // VERTICAL
     // --------------------------------
 
     for (let column = 0; column < 5; column++) {
@@ -233,7 +232,6 @@ function checkLines() {
         const line = [];
 
         for (let row = 0; row < 5; row++) {
-
             line.push(row * 5 + column);
         }
 
@@ -246,7 +244,7 @@ function checkLines() {
 
 
     // --------------------------------
-    // DIAGONAL: TOP LEFT → BOTTOM RIGHT
+    // DIAGONAL \
     // --------------------------------
 
     lines.push({
@@ -263,7 +261,7 @@ function checkLines() {
 
 
     // --------------------------------
-    // DIAGONAL: TOP RIGHT → BOTTOM LEFT
+    // DIAGONAL /
     // --------------------------------
 
     lines.push({
@@ -279,21 +277,21 @@ function checkLines() {
     });
 
 
-    // =================================
-    // CHECK EACH LINE
-    // =================================
+    // --------------------------------
+    // FIND NEW COMPLETED LINES
+    // --------------------------------
 
     for (const line of lines) {
 
-        const isComplete = line.boxes.every(index => {
+        const isComplete =
+            line.boxes.every(index => {
 
-            return board.children[index]
-                .classList
-                .contains("crossed");
-        });
+                return board.children[index]
+                    .classList
+                    .contains("crossed");
+            });
 
 
-        // If complete and not counted before
         if (
             isComplete &&
             !completedLines.has(
@@ -308,16 +306,12 @@ function checkLines() {
     }
 
 
-    // =================================
-    // COUNT COMPLETED LINES
-    // =================================
+    // --------------------------------
+    // DISPLAY B → BI → BIN → BING
+    // --------------------------------
 
-    const totalLines = completedLines.size;
-
-
-    // =================================
-    // SHOW B → BI → BIN → BING → BINGO
-    // =================================
+    const totalLines =
+        completedLines.size;
 
     const lettersToShow =
         Math.min(totalLines, 5);
@@ -328,16 +322,82 @@ function checkLines() {
             .join("");
 
 
-    // =================================
-    // BINGO!
-    // =================================
+    // --------------------------------
+    // BINGO
+    // --------------------------------
 
     if (totalLines >= 5) {
 
         status.textContent =
-            "🎉 You completed 5 straight lines!";
+            "🎉 5 straight lines completed!";
 
         message.textContent =
             "🎉 BINGO! 🎉";
     }
 }
+
+
+// ====================================
+// FULL RESET
+// ====================================
+
+resetLogicButton.addEventListener("click", () => {
+
+    // --------------------------------
+    // CLEAR ALL NUMBERS
+    // --------------------------------
+
+    boardNumbers = Array(25).fill(null);
+
+    placedBoxes = [];
+
+    nextNumber = 1;
+
+    gameStarted = false;
+
+    completedLines.clear();
+
+
+    // --------------------------------
+    // CLEAR ALL BOXES
+    // --------------------------------
+
+    for (let i = 0; i < 25; i++) {
+
+        const box = board.children[i];
+
+        box.textContent = "";
+
+        box.classList.remove("crossed");
+    }
+
+
+    // --------------------------------
+    // RESET DISPLAY
+    // --------------------------------
+
+    currentNumber.textContent = "-";
+
+    message.textContent = "";
+
+    status.textContent =
+        "Tap any box to place 1";
+
+
+    // --------------------------------
+    // SHOW SETUP BUTTONS
+    // --------------------------------
+
+    setupButtons.classList.remove("hidden");
+
+    gameButtons.classList.add("hidden");
+
+
+    // --------------------------------
+    // RESET BUTTON STATES
+    // --------------------------------
+
+    undoButton.disabled = true;
+
+    startButton.disabled = true;
+});
